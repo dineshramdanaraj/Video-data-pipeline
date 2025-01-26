@@ -8,15 +8,7 @@
 *.key
 
 # Build
-**/dist/
-**/build/
-**/output/
-**/tmp/
-**/node_modules/
-**/coverage/
-**/.pnpm-store/
-**/.tsbuildinfo
-**/package-lock.json
+
 **/env
 
 # Python
@@ -48,7 +40,8 @@ pids
 *.iml
 
 # Temporary datasets
-**/video_directory
+**/video_directory/local-sink
+**/video_directory/local-staging
 
 # Generated notebooks ipynb files
 **/datalake/**/*.ipynb
