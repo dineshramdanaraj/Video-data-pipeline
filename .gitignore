@@ -1,0 +1,57 @@
+# Keys
+*.pem
+*.env
+*.env.*
+!*.env.sample
+*.aws
+*.crt
+*.key
+
+# Build
+**/dist/
+**/build/
+**/output/
+**/tmp/
+**/node_modules/
+**/coverage/
+**/.pnpm-store/
+**/.tsbuildinfo
+**/package-lock.json
+**/env
+
+# Python
+**/__pycache__/
+**/*.cache
+**/*_cache
+**/.venv
+**/.ipynb_checkpoints
+# Note: Poetry lock files are committed
+# https://python-poetry.org/docs/basic-usage/#committing-your-poetrylock-file-to-version-control
+
+# MacOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Logs
+logs/
+*.log
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# IDEs
+.idea/
+*.iml
+
+# Temporary datasets
+**/video_directory
+
+# Generated notebooks ipynb files
+**/datalake/**/*.ipynb
+
+# Databricks
+.databricks
