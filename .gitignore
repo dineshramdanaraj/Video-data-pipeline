@@ -40,8 +40,8 @@ pids
 *.iml
 
 # Temporary datasets
-**/video_directory/local-sink
-**/video_directory/local-staging
+**/video_directory/local_sink
+**/video_directory/local_staging
 
 # Generated notebooks ipynb files
 **/datalake/**/*.ipynb
