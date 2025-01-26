@@ -8,6 +8,10 @@
 #       format_name: percent
 #       format_version: '1.3'
 #       jupytext_version: 1.16.6
+#   kernelspec:
+#     display_name: Python 3
+#     language: python
+#     name: python3
 # ---
 
 # %%
@@ -141,5 +145,3 @@ print(result)
 
 # %%
 video_size_quality_rating(video_config=VIDEO_CONFIG, video_path=video_path)
-
-# %%
