@@ -9,7 +9,7 @@
 #       format_version: '1.3'
 #       jupytext_version: 1.16.6
 #   kernelspec:
-#     display_name: Python 3
+#     display_name: env
 #     language: python
 #     name: python3
 # ---
@@ -21,6 +21,7 @@ import subprocess
 from pathlib import Path
 from dotenv import load_dotenv
 load_dotenv()
+from silver_common import ffmpeg_probe
 
 # %%
 path = Path(os.getenv("WATCH_DIRECTORY"))
@@ -41,7 +42,7 @@ VIDEO_CONFIG = {
 
 
 # %%
-def check_video_quality(video_path):
+def check_video_quality(video_path: str)-> dict:
     results = {
         "corruption": False,
         "blank_content": False,
@@ -94,7 +95,7 @@ def record_quality_check(video_path, results):
 
 
 # %%
-def video_size_quality_rating(video_config: dict, video_path: str, threshold: float=0.25)-> int:
+def video_size_quality_rating(video_config: dict, check_video_quality: dict, video_path: str, threshold: float=0.25)-> int:
     # Get video information using ffprobe
     ffprobe_cmd = [
         "ffprobe",
@@ -112,6 +113,11 @@ def video_size_quality_rating(video_config: dict, video_path: str, threshold: fl
         return "Error: Unable to probe video file"
 
     # Extract relevant information
+    if check_video_quality["corruption"] == True:
+        return 0
+    elif check_video_quality["blank video"] == True:
+        return 1
+    
     duration = float(video_info['format']['duration'])
     bitrate = float(video_info['format']['bit_rate'])
     resolution = f"{video_info['streams'][0]['width']}x{video_info['streams'][0]['height']}"
@@ -138,8 +144,20 @@ def video_size_quality_rating(video_config: dict, video_path: str, threshold: fl
 
 
 # %%
+
+
+
+
+# %%
+try:
+    print(__file__)
+except NameError:
+    print("__file__ is not defined in this context")
+
+
+# %%
 # Example usage
-video_path = "/video_directory/4114797-uhd_3840_2160_25fps.mp4"
+video_path = Path("workspace/video_directory/local_sink/4114797-uhd_3840_2160_25fps.mp4")
 result = check_video_quality(video_path)
 print(result)
 

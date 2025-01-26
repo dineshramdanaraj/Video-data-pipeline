@@ -91,7 +91,7 @@ jsonschema-specifications = "2024.10.1"
 jupyter-client = "8.6.3"
 jupyter-core = "5.7.2"
 jupytext = "1.16.6"
-kafka-python = "2.0.2"
+kafka-python = {git = "https://github.com/dpkp/kafka-python.git"}
 lazy-object-proxy = "1.10.0"
 limits = "4.0.1"
 linkify-it-py = "2.0.3"
@@ -187,7 +187,14 @@ wtforms = "3.2.1"
 yarl = "1.18.3"
 zipp = "3.21.0"
 python-dotenv = "^1.0.1"
+kafka-python-ng = {git = "https://github.com/wbarnha/kafka-python-ng.git"}
+ruff = "^0.9.3"
 
+[tool.ruff]
+line-length = 88
+
+[tool.ruff.lint]
+select = ["E", "F", "UP", "B", "SIM", "I"]
 
 [build-system]
 requires = ["poetry-core"]
