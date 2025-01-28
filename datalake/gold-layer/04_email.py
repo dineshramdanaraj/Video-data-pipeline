@@ -44,7 +44,7 @@ def logger(DAG_CONSTANTS: dict, export_video_to_postgres: dict,video: Video) -> 
     table_names = export_video_to_postgres
     if video.deleted:
         _delete_notification(DAG_CONSTANTS=DAG_CONSTANTS, video=video)
-    elif video.processed:
+    elif video.video_process:
         _modification_notification(DAG_CONSTANTS=DAG_CONSTANTS, video=video)
     else:
         _create_notification(DAG_CONSTANTS=DAG_CONSTANTS, video=video)

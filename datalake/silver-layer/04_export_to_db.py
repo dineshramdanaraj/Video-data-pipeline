@@ -18,6 +18,8 @@
 import duckdb
 from IPython.display import display
 
+from datalake.common_func import Video
+
 
 # %%
 def create_table_video_process(duckdb_conn: duckdb.DuckDBPyConnection) -> str:
@@ -41,6 +43,7 @@ def import_silver_to_db(duckdb_conn: duckdb.DuckDBPyConnection,
                         video_size_quality_rating: int,
                         check_video_quality: dict,
                         create_table_video_process: str,
+                        video: Video,
                         process_video: str) -> str:
     table_name = create_table_video_process
     duckdb_conn.execute(f"""
@@ -60,7 +63,7 @@ def import_silver_to_db(duckdb_conn: duckdb.DuckDBPyConnection,
         ?
     )
     """, (
-        DAG_CONSTANTS["VIDEO_INPUT"],
+        video.path,
         process_video,
         video_size_quality_rating,
         check_video_quality['corruption'],

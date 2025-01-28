@@ -14,6 +14,9 @@
 #     name: python3
 # ---
 
+# %% [markdown]
+# ## Silver - Layer
+
 # %%
 # So that modules can be reloaded without restarting the kernel
 # %reload_ext autoreload
@@ -23,9 +26,14 @@
 # %%
 # Common imports
 import importlib
+from datetime import datetime
 
 from hamilton import driver
 from hamilton.execution import executors
+
+from datalake.common_func import Video
+
+
 
 # %%
 silver_common = importlib.import_module("silver_common")
@@ -34,13 +42,15 @@ common_func = importlib.import_module("datalake.common_func")
 video_check = importlib.import_module("02_video_check")
 derivative = importlib.import_module("03_derivative")
 export_to_db = importlib.import_module("04_export_to_db")
+update_video_data = importlib.import_module("05_update_video_data")
+
 
 # https://github.com/DAGWorks-Inc/hamilton/issues/685
 
 try:
     hamilton_driver = (
         driver.Builder()
-        .with_modules(silver_common, common_func, video_check, derivative, export_to_db)
+        .with_modules(silver_common, common_func, video_check, derivative, export_to_db, update_video_data)
         .enable_dynamic_execution(allow_experimental_mode=True)
         .with_local_executor(executors.SynchronousLocalTaskExecutor())
         .build()
@@ -65,9 +75,15 @@ DAG_CONSTANTS = {
     "7680x4320": 52000000  # 4320p (8K)
 },
     "STAGING_DIRECTORY": "C:/Program Files/chop assignment/video_directory/local_staging",
-    "VIDEO_INPUT": "C:/Program Files/chop assignment/video_directory/local_sink/4114797-uhd_3840_2160_25fps.mp4"
     
 }
+
+
+video = Video(path="C:/Program Files/chop assignment/video_directory/local_staging/4114797-uhd_3840_2160_25fps.mp4",
+arrival_time=datetime(2025, 1, 28, 4, 0),
+has_metadata= True,
+deleted=False)
+
 
 # %%
 result = hamilton_driver.execute(
@@ -75,5 +91,12 @@ result = hamilton_driver.execute(
     inputs={"DAG_CONSTANTS": DAG_CONSTANTS},
 )
 result["explore_country"]
+
+# %%
+result = hamilton_driver.execute(
+    ["update_video_data"],
+    inputs={"DAG_CONSTANTS": DAG_CONSTANTS, "video": video},
+)
+result["update_video_data"]
 
 # %%

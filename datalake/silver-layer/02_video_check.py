@@ -18,16 +18,17 @@
 import os
 from typing import Union
 
+from datalake.common_func import Video
+
 
 # %%
-def check_video_quality(DAG_CONSTANTS: dict, ffmpeg_probe: Union[dict, str])-> dict:
+def check_video_quality(DAG_CONSTANTS: dict,video: Video, ffmpeg_probe: Union[dict, str])-> dict:
     results = {
         "corruption": False,
         "blank_content": False,
         "file_size_anomaly": False
     }
-    
-    video_path = DAG_CONSTANTS['VIDEO_INPUT']
+    video_path = video.path
     # Check file size
     file_size = os.path.getsize(video_path)
     if file_size < 1000:  # Arbitrary threshold, adjust as needed
@@ -60,8 +61,9 @@ def video_size_quality_rating(
         DAG_CONSTANTS: dict, 
         check_video_quality: dict, 
         ffmpeg_probe: Union[dict, str],
+        video: Video,
         threshold: float=0.25)-> int:
-    video_path = DAG_CONSTANTS['VIDEO_INPUT']
+    video_path = video.path
     video_config = DAG_CONSTANTS['VIDEO_CONFIG']
     video_info = ffmpeg_probe
     if video_info == "corrupt" or check_video_quality["corruption"]:

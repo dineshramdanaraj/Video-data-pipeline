@@ -21,21 +21,11 @@ from datalake.common_func import Video
 
 
 # %%
-def export_video_to_postgres(
-    create_video_schema: str,
-    postgres_conn: pool.SimpleConnectionPool,
-    video: Video
-) -> dict:
-    """
-    Exports video data from a Video object to PostgreSQL with proper schema.
-    Creates the table if it doesn't exist and adds data to the existing table.
-    """
-    schema_name = create_video_schema
-    table_names = {}
-
-    # Define target PostgreSQL table name
-    table_name = f"{schema_name}.video_process"
-
+def create_videos_table(
+        create_video_schema: str,
+        postgres_conn: pool.SimpleConnectionPool
+) -> str:
+    table_name = f"{create_video_schema}.videos"
     conn = postgres_conn.getconn()
     cur = conn.cursor()
 
@@ -46,36 +36,102 @@ def export_video_to_postgres(
             Video_Path VARCHAR,
             Arrival_Time TIMESTAMP,
             Has_Metadata BOOLEAN,
-            Quality_Rating INTEGER,
-            Processed BOOLEAN,
-            Annotated BOOLEAN,
             Deleted BOOLEAN
         );
         """)
+        conn.commit()
+    finally:
+        cur.close()
+        postgres_conn.putconn(conn)
+    print("table created - 1")
+    return table_name
+
+
+
+# %%
+def create_videos_process_table(
+        create_video_schema: str,
+        postgres_conn: pool.SimpleConnectionPool
+) -> str:
+    table_name = f"{create_video_schema}.video_process"
+    conn = postgres_conn.getconn()
+    cur = conn.cursor()
+
+    try:
+        # Create target PostgreSQL table if it doesn't exist
+        cur.execute(f"""
+        CREATE TABLE IF NOT EXISTS {table_name} (
+            Derivative_Path VARCHAR,
+            Quality_Rating INTEGER,
+            Size_Anamoly BOOLEAN,
+            Corruption BOOLEAN,
+            Blank_Conntent BOOLEAN
+        );
+        """)
+        conn.commit()
+    finally:
+        cur.close()
+        postgres_conn.putconn(conn)
+    print("table created - 2")
+    
+    return table_name
+    
+
+
+# %%
+def export_video_to_postgres(
+    create_videos_table: str,
+    create_videos_process_table: str,
+    postgres_conn: pool.SimpleConnectionPool,
+    video: Video
+) -> dict:
+    """
+    Exports video data from a Video object to PostgreSQL with proper schema.
+    Creates the table if it doesn't exist and adds data to the existing table.
+    """
+
+    table_names = {}
+
+    conn = postgres_conn.getconn()
+    cur = conn.cursor()
+
+    try:
+       
 
         # Insert data from the Video object into the PostgreSQL table
         cur.execute(f"""
-        INSERT INTO {table_name} (
+        INSERT INTO {create_videos_table} (
             Video_Path,
             Arrival_Time,
             Has_Metadata,
-            Quality_Rating,
-            Processed,
-            Annotated,
             Deleted
-        ) VALUES (%s, %s, %s, %s, %s, %s, %s);
+        ) VALUES (%s, %s, %s, %s);
         """, (
             video.path,
             video.arrival_time,
             video.has_metadata,
-            video.quality_rating,
-            video.processed,
-            video.annotated,
             video.deleted
+        ))
+        if video.video_process:
+            cur.execute(f"""
+        INSERT INTO {create_videos_process_table} (
+            Derivative_Path,
+            Quality_Rating,
+            Size_Anamoly,
+            Corruption,
+            Blank_Conntent
+        ) VALUES (%s, %s, %s, %s, %s);
+        """, (
+            video.video_process.derivative_path,
+            video.video_process.quality_rating,
+            video.video_process.size_anamoly,
+            video.video_process.corruption,
+            video.video_process.blank_content
         ))
 
         conn.commit()
-        table_names["video_process"] = table_name
+        table_names['video_process'] = create_videos_process_table
+        table_names['videos'] = create_videos_table
 
     finally:
         cur.close()

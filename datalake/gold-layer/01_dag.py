@@ -14,6 +14,9 @@
 #     name: python3
 # ---
 
+# %% [markdown]
+# ## Gold- Layer
+
 # %%
 # So that modules can be reloaded without restarting the kernel
 # %reload_ext autoreload
@@ -30,7 +33,7 @@ from dotenv import load_dotenv
 from hamilton import driver
 from hamilton.execution import executors
 
-from datalake.common_func import Video
+from datalake.common_func import Video, VideoProcess
 
 
 
@@ -64,12 +67,17 @@ DAG_CONSTANTS = {
     "EMAIL_RECIEVER": os.getenv("EMAIL_RECIEVER")
 }
 
-video = Video(path="C:/Program Files/chop assignment/video_directory/local_staging/4114797-uhd_3840_2160_25fps_processed.mp4",
+video_process = VideoProcess(derivative_path="video_directory/local_staging/4114797-uhd_3840_2160_25fps_processed.mp4",
+                             size_anamoly= False,
+                             corruption= False,
+                             blank_content= False,
+                             quality_rating= 4
+                             )
+
+video = Video(path="C:/Program Files/chop assignment/video_directory/local_staging/4114797-uhd_3840_2160_25fps.mp4",
 arrival_time=datetime(2025, 1, 28, 4, 0),
-has_metadata=True,
-quality_rating=4,
-processed=True,
-annotated=False,
+has_metadata= True,
+video_process= video_process,
 deleted=False)
 
 # %%
