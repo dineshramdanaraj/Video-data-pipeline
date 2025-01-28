@@ -30,8 +30,14 @@
 # ## connecting in memory data (duckdb)
 
 # %%
+import os
+import smtplib
 from dataclasses import dataclass
+from email.mime.text import MIMEText
 from typing import Optional
+
+import duckdb
+from dotenv import load_dotenv
 
 
 # %%
@@ -45,10 +51,30 @@ class Video:
     annotated: bool = False
     deleted: bool = False
 
-# %% [markdown]
-# ## any kafka code for bot prod and cons
+
+# %%
+def duckdb_conn() -> duckdb.DuckDBPyConnection:
+    """
+    Create an in-memory DuckDB connection
+    https://duckdb.org/docs/api/python/dbapi.html
+    https://duckdb.org/docs/guides/python/multiple_threads.html
+    """
+    return duckdb.connect(":memory:")
 
 
-# %% [markdown]
-# ##any airflow common
+# %%
+def _send_email(subject: str, body: str, to_email: str)-> None:
+    load_dotenv()
+    from_email = os.getenv("EMAIL_USER")
+    msg = MIMEText(body)
+    msg['Subject'] = subject
+    msg['From'] = from_email
+    msg['To'] = to_email
 
+    smtp_server = smtplib.SMTP(os.getenv('SMTP_SERVER'), os.getenv('SMTP_PORT'))
+    smtp_server.starttls()
+    smtp_server.login(from_email, os.getenv('EMAIL_PASSWORD'))
+    smtp_server.send_message(msg)
+    smtp_server.quit()
+
+# %%

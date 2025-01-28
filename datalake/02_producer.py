@@ -15,15 +15,16 @@
 # ---
 
 # %%
-import time
-import os
-from watchdog.observers import Observer
-from watchdog.events import FileSystemEventHandler
-from datetime import datetime
-from dataclasses import dataclass, asdict
-from typing import Optional
 import json
+import os
+import time
+from dataclasses import asdict
+from datetime import datetime
+
 from kafka import KafkaProducer
+from watchdog.events import FileSystemEventHandler
+from watchdog.observers import Observer
+
 from datalake.common_func import Video
 
 

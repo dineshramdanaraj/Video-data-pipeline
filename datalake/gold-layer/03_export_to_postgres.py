@@ -15,50 +15,74 @@
 # ---
 
 # %%
-import duckdb
-from poi_datalake.gold_to_db import gold_layer_common
 from psycopg2 import pool
+
+from datalake.common_func import Video
 
 
 # %%
 def export_video_to_postgres(
-    DAG_CONSTANTS: dict,
     create_video_schema: str,
-    duckdb_conn: duckdb.DuckDBPyConnection,
     postgres_conn: pool.SimpleConnectionPool,
+    video: Video
 ) -> dict:
     """
-    Exports video tables from DuckDB to PostgreSQL with proper schema.
+    Exports video data from a Video object to PostgreSQL with proper schema.
+    Creates the table if it doesn't exist and adds data to the existing table.
     """
     schema_name = create_video_schema
     table_names = {}
 
-    tables = {"merge_video": "VIDEO"}
+    # Define target PostgreSQL table name
+    table_name = f"{schema_name}.video_process"
 
-    for temp_table_name, staging_key in tables.items():
-        table_name = f"{schema_name}.{temp_table_name}"
+    conn = postgres_conn.getconn()
+    cur = conn.cursor()
 
-        duckdb_conn.execute(f"""
-        CREATE OR REPLACE TABLE {temp_table_name} AS
-        SELECT * FROM parquet_scan('{DAG_CONSTANTS["STAGING"][staging_key]}');
+    try:
+        # Create target PostgreSQL table if it doesn't exist
+        cur.execute(f"""
+        CREATE TABLE IF NOT EXISTS {table_name} (
+            Video_Path VARCHAR,
+            Arrival_Time TIMESTAMP,
+            Has_Metadata BOOLEAN,
+            Quality_Rating INTEGER,
+            Processed BOOLEAN,
+            Annotated BOOLEAN,
+            Deleted BOOLEAN
+        );
         """)
 
-        conn = postgres_conn.getconn()
-        cur = conn.cursor()
+        # Insert data from the Video object into the PostgreSQL table
+        cur.execute(f"""
+        INSERT INTO {table_name} (
+            Video_Path,
+            Arrival_Time,
+            Has_Metadata,
+            Quality_Rating,
+            Processed,
+            Annotated,
+            Deleted
+        ) VALUES (%s, %s, %s, %s, %s, %s, %s);
+        """, (
+            video.path,
+            video.arrival_time,
+            video.has_metadata,
+            video.quality_rating,
+            video.processed,
+            video.annotated,
+            video.deleted
+        ))
 
-        try:
-            gold_layer_common.convert_duckdb_to_postgres(
-                duckdb_conn=duckdb_conn,
-                pg_pool=postgres_conn,
-                duckdb_table_name=temp_table_name,
-                postgres_table_name=table_name,
-            )
-            conn.commit()
-            table_names[temp_table_name] = table_name
+        conn.commit()
+        table_names["video_process"] = table_name
 
-        finally:
-            cur.close()
-            postgres_conn.putconn(conn)
-            duckdb_conn.execute(f"DROP TABLE IF EXISTS {temp_table_name}")
+    finally:
+        cur.close()
+        postgres_conn.putconn(conn)
 
     return table_names
+
+
+
+# %%

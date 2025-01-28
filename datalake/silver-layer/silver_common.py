@@ -15,19 +15,20 @@
 # ---
 
 # %%
-import subprocess
 import json
+import subprocess
+from typing import Union
 
 
 # %%
-def ffmpeg_probe(video_path: str):
+def ffmpeg_probe(DAG_CONSTANTS: dict) -> Union[dict, str]:
     cmd = [
         "ffprobe",
         "-v", "quiet",
         "-print_format", "json",
         "-show_format",
         "-show_streams",
-        video_path
+        DAG_CONSTANTS['VIDEO_INPUT']
     ]
     
     try:
@@ -37,3 +38,5 @@ def ffmpeg_probe(video_path: str):
     except subprocess.CalledProcessError:
         return "corrupt"
 
+
+# %%

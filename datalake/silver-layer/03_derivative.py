@@ -15,12 +15,20 @@
 # ---
 
 # %%
+import os
 import subprocess
 
 
 # %%
-def process_video(input_path:str, output_dir: str)-> str:
-    output_path = f"{output_dir}/{input_path.replace('.mp4', '_processed.mp4')}"
+def process_video(DAG_CONSTANTS: dict) -> str:
+    # Extract file name from input path
+    input_path = DAG_CONSTANTS['VIDEO_INPUT']
+    file_name = os.path.basename(input_path)
+    output_file = file_name.replace('.mp4', '_processed.mp4')
+    output_path = os.path.join(DAG_CONSTANTS['STAGING_DIRECTORY'], output_file)
+    
+    # Choose the target resolution (e.g., 720p)
+    
     cmd = [
         "ffmpeg",
         "-i", input_path,
@@ -30,5 +38,3 @@ def process_video(input_path:str, output_dir: str)-> str:
     
     subprocess.run(cmd, check=True)
     return output_path
-
-# %%

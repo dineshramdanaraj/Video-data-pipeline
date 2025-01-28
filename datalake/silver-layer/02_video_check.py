@@ -9,65 +9,37 @@
 #       format_version: '1.3'
 #       jupytext_version: 1.16.6
 #   kernelspec:
-#     display_name: env
+#     display_name: datalake-NzdzUkV_-py3.12
 #     language: python
 #     name: python3
 # ---
 
 # %%
 import os
-import json
-import subprocess
-from pathlib import Path
-from dotenv import load_dotenv
-load_dotenv()
-from silver_common import ffmpeg_probe
-
-# %%
-path = Path(os.getenv("WATCH_DIRECTORY"))
-print(path)
-
-# %%
-VIDEO_CONFIG = {
-    "256x144": 100000,   # 144p
-    "426x240": 250000,   # 240p
-    "640x360": 500000,   # 360p
-    "854x480": 750000,   # 480p
-    "1280x720": 1500000, # 720p
-    "1920x1080": 3000000,  # 1080p
-    "2560x1440": 6000000,  # 1440p (2K)
-    "3840x2160": 13000000,  # 2160p (4K)
-    "7680x4320": 52000000  # 4320p (8K)
-}
+from typing import Union
 
 
 # %%
-def check_video_quality(video_path: str)-> dict:
+def check_video_quality(DAG_CONSTANTS: dict, ffmpeg_probe: Union[dict, str])-> dict:
     results = {
         "corruption": False,
         "blank_content": False,
         "file_size_anomaly": False
     }
     
+    video_path = DAG_CONSTANTS['VIDEO_INPUT']
     # Check file size
     file_size = os.path.getsize(video_path)
     if file_size < 1000:  # Arbitrary threshold, adjust as needed
         results["file_size_anomaly"] = True
     
     # Use ffprobe to get video information
-    cmd = [
-        "ffprobe",
-        "-v", "quiet",
-        "-print_format", "json",
-        "-show_format",
-        "-show_streams",
-        video_path
-    ]
     
-    try:
-        output = subprocess.check_output(cmd).decode('utf-8')
-        video_info = json.loads(output)
-        
+    video_info = ffmpeg_probe
+    
+    if video_info == "corrupt":
+        results["corruption"] = True
+    else:
         # Check for corruption
         if "streams" not in video_info or len(video_info["streams"]) == 0:
             results["corruption"] = True
@@ -75,49 +47,31 @@ def check_video_quality(video_path: str)-> dict:
         # Check for blank content
         for stream in video_info.get("streams", []):
             if stream["codec_type"] == "video":
-                if int(stream["duration_ts"]) == 0:
+                if int(float(stream.get("duration", "0"))) == 0:
                     results["blank_content"] = True
                 break
-        
-    except subprocess.CalledProcessError:
-        results["corruption"] = True
     
     return results
 
 
 
 # %%
-def record_quality_check(video_path, results):
-    # This function would typically write to a database
-    # For this example, we'll just print the results
-    print(f"Quality check results for {video_path}:")
-    print(json.dumps(results, indent=2))
-
-
-# %%
-def video_size_quality_rating(video_config: dict, check_video_quality: dict, video_path: str, threshold: float=0.25)-> int:
-    # Get video information using ffprobe
-    ffprobe_cmd = [
-        "ffprobe",
-        "-v", "quiet",
-        "-print_format", "json",
-        "-show_format",
-        "-show_streams",
-        video_path
-    ]
-    rating = 0
-    try:
-        output = subprocess.check_output(ffprobe_cmd).decode('utf-8')
-        video_info = json.loads(output)
-    except subprocess.CalledProcessError:
-        return "Error: Unable to probe video file"
-
-    # Extract relevant information
-    if check_video_quality["corruption"] == True:
+def video_size_quality_rating(
+        DAG_CONSTANTS: dict, 
+        check_video_quality: dict, 
+        ffmpeg_probe: Union[dict, str],
+        threshold: float=0.25)-> int:
+    video_path = DAG_CONSTANTS['VIDEO_INPUT']
+    video_config = DAG_CONSTANTS['VIDEO_CONFIG']
+    video_info = ffmpeg_probe
+    if video_info == "corrupt" or check_video_quality["corruption"]:
         return 0
-    elif check_video_quality["blank video"] == True:
+    elif check_video_quality["blank_content"]:
         return 1
     
+    rating = 1
+    
+    # Extract relevant information
     duration = float(video_info['format']['duration'])
     bitrate = float(video_info['format']['bit_rate'])
     resolution = f"{video_info['streams'][0]['width']}x{video_info['streams'][0]['height']}"
@@ -126,7 +80,8 @@ def video_size_quality_rating(video_config: dict, check_video_quality: dict, vid
         if bitrate >= video_config[resolution]:
             rating += 2
         elif bitrate >= (1-threshold)*(video_config[resolution]):
-            rating+=1
+            rating += 1
+    
     # Calculate expected file size
     expected_size = (bitrate * duration) / 8  # Convert bits to bytes
     
@@ -136,30 +91,9 @@ def video_size_quality_rating(video_config: dict, check_video_quality: dict, vid
     # Compare sizes
     size_ratio = actual_size / expected_size
     
-    if size_ratio  > (1 - threshold) and size_ratio < (1 + threshold):
-        rating+=1
+    if (1 - threshold) < size_ratio < (1 + threshold):
+        rating += 1
     
     return rating
 
 
-
-# %%
-
-
-
-
-# %%
-try:
-    print(__file__)
-except NameError:
-    print("__file__ is not defined in this context")
-
-
-# %%
-# Example usage
-video_path = Path("workspace/video_directory/local_sink/4114797-uhd_3840_2160_25fps.mp4")
-result = check_video_quality(video_path)
-print(result)
-
-# %%
-video_size_quality_rating(video_config=VIDEO_CONFIG, video_path=video_path)
