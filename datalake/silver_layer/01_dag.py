@@ -41,7 +41,6 @@ common_func = importlib.import_module("datalake.common_func")
 
 video_check = importlib.import_module("02_video_check")
 derivative = importlib.import_module("03_derivative")
-export_to_db = importlib.import_module("04_export_to_db")
 update_video_data = importlib.import_module("05_update_video_data")
 
 
@@ -50,7 +49,7 @@ update_video_data = importlib.import_module("05_update_video_data")
 try:
     hamilton_driver = (
         driver.Builder()
-        .with_modules(silver_common, common_func, video_check, derivative, export_to_db, update_video_data)
+        .with_modules(silver_common, common_func, video_check, derivative,update_video_data)
         .enable_dynamic_execution(allow_experimental_mode=True)
         .with_local_executor(executors.SynchronousLocalTaskExecutor())
         .build()

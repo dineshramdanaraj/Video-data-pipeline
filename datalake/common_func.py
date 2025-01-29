@@ -36,8 +36,17 @@ from dataclasses import dataclass
 from email.mime.text import MIMEText
 from typing import Optional
 
-import duckdb
 from dotenv import load_dotenv
+
+
+# %%
+@dataclass
+class VideoProcess:
+    size_anamoly: bool
+    corruption: bool
+    blank_content: bool
+    quality_rating: int
+    derivative_path: Optional[str] = None
 
 
 # %%
@@ -46,20 +55,8 @@ class Video:
     path: str
     arrival_time: str
     has_metadata: bool
-    quality_rating: Optional[int] = None
-    processed: bool = False
-    annotated: bool = False
+    video_process: Optional[VideoProcess] = None
     deleted: bool = False
-
-
-# %%
-def duckdb_conn() -> duckdb.DuckDBPyConnection:
-    """
-    Create an in-memory DuckDB connection
-    https://duckdb.org/docs/api/python/dbapi.html
-    https://duckdb.org/docs/guides/python/multiple_threads.html
-    """
-    return duckdb.connect(":memory:")
 
 
 # %%

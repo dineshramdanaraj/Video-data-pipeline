@@ -24,6 +24,8 @@ from kafka import KafkaConsumer
 
 
 # %%
+
+# %%
 # Setup logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)

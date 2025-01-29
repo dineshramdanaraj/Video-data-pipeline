@@ -14,11 +14,13 @@
 # ---
 
 # %%
-import smtplib
-from email.mime.text import MIMEText
-from email.mime.multipart import MIMEMultipart
 import os
+import smtplib
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+
 from dotenv import load_dotenv
+
 load_dotenv()
 
 # %%
@@ -29,13 +31,11 @@ body_metadata = "The metadata file is missing for a recently uploaded video. Ple
 subject_annotation = "Video Ready for Annotation"
 body_annotation = "A new video file has been processed and is ready for annotation."
 
-send_email_notification(subject_metadata, body_metadata, "dinesramdanaraj@ufl.edu")
-send_email_notification(subject_annotation, body_annotation, "dinesramdanaraj@ufl.edu")
+
 
 
 # %%
-import smtplib
-from email.mime.text import MIMEText
+
 
 def send_email(subject, body, to_email):
     from_email = os.getenv("EMAIL_USER")

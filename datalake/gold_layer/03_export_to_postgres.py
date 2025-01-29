@@ -91,7 +91,8 @@ def export_video_to_postgres(
     """
 
     table_names = {}
-
+    video_process_table = create_videos_process_table
+    video_table = create_videos_table
     conn = postgres_conn.getconn()
     cur = conn.cursor()
 
@@ -100,7 +101,7 @@ def export_video_to_postgres(
 
         # Insert data from the Video object into the PostgreSQL table
         cur.execute(f"""
-        INSERT INTO {create_videos_table} (
+        INSERT INTO {video_table} (
             Video_Path,
             Arrival_Time,
             Has_Metadata,
@@ -114,7 +115,7 @@ def export_video_to_postgres(
         ))
         if video.video_process:
             cur.execute(f"""
-        INSERT INTO {create_videos_process_table} (
+        INSERT INTO {video_process_table} (
             Derivative_Path,
             Quality_Rating,
             Size_Anamoly,
@@ -122,16 +123,16 @@ def export_video_to_postgres(
             Blank_Conntent
         ) VALUES (%s, %s, %s, %s, %s);
         """, (
-            video.video_process.derivative_path,
-            video.video_process.quality_rating,
-            video.video_process.size_anamoly,
-            video.video_process.corruption,
-            video.video_process.blank_content
+            video.video_process['derivative_path'],
+            video.video_process['quality_rating'],
+            video.video_process['size_anamoly'],
+            video.video_process['corruption'],
+            video.video_process['blank_content']
         ))
 
         conn.commit()
-        table_names['video_process'] = create_videos_process_table
-        table_names['videos'] = create_videos_table
+        table_names['video_process'] = video_process_table
+        table_names['videos'] = video_table
 
     finally:
         cur.close()
@@ -140,5 +141,3 @@ def export_video_to_postgres(
     return table_names
 
 
-
-# %%

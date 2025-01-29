@@ -64,7 +64,8 @@ hamilton_driver.display_all_functions(orient="TB")
 # %%
 load_dotenv()
 DAG_CONSTANTS = {
-    "EMAIL_RECIEVER": os.getenv("EMAIL_RECIEVER")
+    "EMAIL_RECIEVER": os.getenv("EMAIL_RECIEVER"),
+    "PG_CONN": os.getenv("PG_CONN_URI") 
 }
 
 video_process = VideoProcess(derivative_path="video_directory/local_staging/4114797-uhd_3840_2160_25fps_processed.mp4",
@@ -86,3 +87,5 @@ result = hamilton_driver.execute(
     inputs={"DAG_CONSTANTS": DAG_CONSTANTS, "video": video},
 )
 result["logger"]
+
+# %%
