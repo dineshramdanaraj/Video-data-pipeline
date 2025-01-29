@@ -21,11 +21,11 @@ import time
 from dataclasses import asdict
 from datetime import datetime
 
-from kafka import KafkaProducer
 from watchdog.events import FileSystemEventHandler
 from watchdog.observers import Observer
 
 from datalake.common_func import Video
+from kafka import KafkaProducer
 
 
 # %%
@@ -86,12 +86,11 @@ def watch_directory(path: str, kafka_producer: KafkaProducer, topic: str)-> None
 
 # %%
 if __name__ == "__main__":
-    watch_dir = "C:/Program Files/chop assignment/video_directory/local_sink"
-    kafka_bootstrap_servers = ['localhost:9092']
-    kafka_topic = 'video_events'
+    watch_dir = "./video_directory/local_sink"
+    kafka_bootstrap_servers = ['localhost:9094']
+    kafka_topic = 'Video_Watcher'
 
-    producer = KafkaProducer(bootstrap_servers=kafka_bootstrap_servers,
-                             value_serializer=lambda v: json.dumps(v).encode('utf-8'))
+    producer = KafkaProducer(bootstrap_servers=kafka_bootstrap_servers)
 
     print(f"Watching directory: {watch_dir}")
     watch_directory(watch_dir, kafka_producer=producer, topic=kafka_topic)

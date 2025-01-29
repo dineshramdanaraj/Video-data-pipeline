@@ -42,6 +42,8 @@ pids
 # Temporary datasets
 **/video_directory/local_sink
 **/video_directory/local_staging
+**/kafka
+**/logs
 
 # Generated notebooks ipynb files
 **/datalake/**/*.ipynb
