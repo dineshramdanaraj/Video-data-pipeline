@@ -52,6 +52,7 @@ x-airflow-common:
   #image: ${AIRFLOW_IMAGE_NAME:-apache/airflow:2.10.4}
   build: .
   environment:
+    
     &airflow-common-env
 
     AIRFLOW__CORE__EXECUTOR: CeleryExecutor
@@ -73,6 +74,15 @@ x-airflow-common:
     # The following line can be used to set a custom config file, stored in the local config folder
     # If you want to use it, outcomment it and replace airflow.cfg with the name of your config file
     AIRFLOW_CONFIG: '/opt/airflow/config/airflow.cfg'
+  
+    AIRFLOW_CONN_KAFKA_DEFAULT: '{
+          "conn_type": "kafka",
+          "extra": {
+            "bootstrap.servers": "localhost:9094",
+            "group.id": "video_processor",
+            "auto.offset.reset": "earliest"
+          }
+        }'
   volumes:
     - ${AIRFLOW_PROJ_DIR:-.}/dags:/opt/airflow/dags
     - ${AIRFLOW_PROJ_DIR:-.}/logs:/opt/airflow/logs
@@ -105,6 +115,8 @@ services:
       retries: 5
       start_period: 5s
     restart: always
+    networks:
+      - kafka_network
 
   redis:
     # Redis is limited to 7.2-bookworm due to licencing change
@@ -119,6 +131,8 @@ services:
       retries: 50
       start_period: 30s
     restart: always
+    networks:
+      - kafka_network
 
   airflow-webserver:
     env_file:
@@ -138,6 +152,8 @@ services:
       <<: *airflow-common-depends-on
       airflow-init:
         condition: service_completed_successfully
+    networks:
+      - kafka_network
 
   airflow-scheduler:
     env_file:
@@ -155,6 +171,8 @@ services:
       <<: *airflow-common-depends-on
       airflow-init:
         condition: service_completed_successfully
+    networks:
+      - kafka_network
 
   airflow-worker:
     env_file:
@@ -180,6 +198,8 @@ services:
       <<: *airflow-common-depends-on
       airflow-init:
         condition: service_completed_successfully
+    networks:
+      - kafka_network
 
   airflow-triggerer:
  
@@ -196,6 +216,8 @@ services:
       <<: *airflow-common-depends-on
       airflow-init:
         condition: service_completed_successfully
+    networks:
+      - kafka_network
 
   airflow-init:
     <<: *airflow-common
@@ -260,6 +282,8 @@ services:
     user: "0:0"
     volumes:
       - ${AIRFLOW_PROJ_DIR:-.}:/sources
+    networks:
+      - kafka_network
 
   airflow-cli:
     <<: *airflow-common
@@ -273,6 +297,8 @@ services:
       - bash
       - -c
       - airflow
+    networks:
+      - kafka_network
 
   # You can enable flower by adding "--profile flower" option e.g. docker-compose --profile flower up
   # or by explicitly targeted on the command line e.g. docker-compose up flower.
@@ -295,6 +321,11 @@ services:
       <<: *airflow-common-depends-on
       airflow-init:
         condition: service_completed_successfully
-
+    networks:
+      - kafka_network
 volumes:
   postgres-db-volume:
+
+networks:
+  kafka_network:
+    name: kafka_network

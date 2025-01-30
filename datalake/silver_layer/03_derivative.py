@@ -22,12 +22,14 @@ from datalake.common_func import Video
 
 
 # %%
-def process_video(video: Video, DAG_CONSTANTS: dict) -> str:
+def process_video(video_path_fix: Video, DAG_CONSTANTS: dict) -> str:
     # Extract file name from input path
-    input_path = video.path
+    input_path = video_path_fix.path
     file_name = os.path.basename(input_path)
     output_file = file_name.replace('.mp4', '_processed.mp4')
     output_path = os.path.join(DAG_CONSTANTS['STAGING_DIRECTORY'], output_file)
+    if os.path.exists(output_path):
+        os.remove(output_path)
     
     # Choose the target resolution (e.g., 720p)
     

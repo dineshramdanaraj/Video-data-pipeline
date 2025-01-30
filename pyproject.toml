@@ -16,9 +16,10 @@ license = "-"
 sf-hamilton = {extras = ["visualization"], version = "^1.86.1"}
 psycopg2-binary = "^2.9.10"
 python-dotenv = "^1.0.1"
-confluent-kafka = "^2.3.0"
+apache-airflow-providers-apache-kafka = "^1.0.0"
 kafka-python = {git = "https://github.com/dpkp/kafka-python.git"}
-kafka-python-ng = {git = "https://github.com/wbarnha/kafka-python-ng.git"}
+
+
 
 [tool.poetry.dependencies]
 python = ">=3.12,<3.13"
@@ -203,6 +204,7 @@ python-dotenv = "^1.0.1"
 kafka-python-ng = {git = "https://github.com/wbarnha/kafka-python-ng.git"}
 ruff = "^0.9.3"
 graphviz = "^0.20.3"
+confluent-kafka = "^2.8.0"
 
 [tool.ruff]
 line-length = 100

@@ -78,18 +78,11 @@ DAG_CONSTANTS = {
 }
 
 
-video = Video(path="C:/Program Files/chop assignment/video_directory/local_staging/4114797-uhd_3840_2160_25fps.mp4",
+video = Video(path="C:/Program Files/chop assignment/video_directory/local_staging\\4114797-uhd_3840_2160_25fps.mp4",
 arrival_time=datetime(2025, 1, 28, 4, 0),
 has_metadata= True,
 deleted=False)
 
-
-# %%
-result = hamilton_driver.execute(
-    ["explore_country"],
-    inputs={"DAG_CONSTANTS": DAG_CONSTANTS},
-)
-result["explore_country"]
 
 # %%
 result = hamilton_driver.execute(

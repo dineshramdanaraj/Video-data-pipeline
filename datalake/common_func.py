@@ -54,7 +54,7 @@ class VideoProcess:
 class Video:
     path: str
     arrival_time: str
-    has_metadata: bool
+    has_metadata: bool = False
     video_process: Optional[VideoProcess] = None
     deleted: bool = False
 
@@ -74,4 +74,25 @@ def _send_email(subject: str, body: str, to_email: str)-> None:
     smtp_server.send_message(msg)
     smtp_server.quit()
 
+
 # %%
+def read_config()-> dict:
+  # reads the client configuration from client.properties
+  # and returns it as a key-value map
+  config = {}
+  with open("client.properties") as fh:
+    for line in fh:
+      line = line.strip()
+      if len(line) != 0 and line[0] != "#":
+        parameter, value = line.strip().split('=', 1)
+        config[parameter] = value.strip()
+  return config
+
+
+# %%
+def video_path_fix(video: Video) -> Video:
+    video_path = video.path
+    video_path = os.path.normpath(video_path)
+    video_path = video_path.replace("\\", "/")
+    video.path = video_path
+    return video

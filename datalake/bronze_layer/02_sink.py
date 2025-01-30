@@ -18,33 +18,35 @@
 from datetime import datetime
 
 from datalake.common_func import Video
+from typing import Union, Optional
+import json
 
 
 # %%
-def kafka_message_to_video(message: dict) -> Video:
-    if message['deleted']:
-        video = Video(
+def kafka_message_to_video(message: Optional[Union[dict, str]]) -> Optional[Video]:
+    # Handle None input
+    if message is None:
+        return None
+
+    # If message is a string, parse it into a dictionary
+    if isinstance(message, str):
+        message = json.loads(message)
+    
+
+    # Ensure message is a dictionary after parsing
+    if not isinstance(message, dict):
+        raise TypeError(f"Expected a dictionary or JSON string, got {type(message)}")
+
+    # Extract fields and create Video object
+    
+    video = Video(
             path=message['path'],
             arrival_time=datetime.fromisoformat(message['arrival_time']),
-            has_metadata=message['has_metadata'],
-            deleted=True
+            has_metadata=message.get('has_metadata'), 
+            deleted=message.get('deleted')
         )
-    elif not message['has_metadata']:
-        video = Video(
-            path=message['path'],
-            arrival_time=datetime.fromisoformat(message['arrival_time']),
-            has_metadata=False,
-            deleted=False
-        )
-    else:
-        video = Video(
-            path=message['path'],
-            arrival_time=datetime.fromisoformat(message['arrival_time']),
-            has_metadata=True,
-            deleted=False
-        )
+    
+
     return video
-
-
 
 # %%

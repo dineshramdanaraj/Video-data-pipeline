@@ -22,13 +22,13 @@ from datalake.common_func import Video, VideoProcess
 
 # %%
 
-def update_video_data(video: Video,
+def update_video_data(video_path_fix: Video,
                         video_size_quality_rating: int,
                         check_video_quality: dict,
                         process_video: str) -> Video:
-    if video.deleted or not video.has_metadata:
+    if video_path_fix.deleted or not video_path_fix.has_metadata:
         print("skipped")
-        return video
+        return video_path_fix
     else:
         video_process = VideoProcess(derivative_path=process_video, 
                                     size_anamoly=check_video_quality['file_size_anomaly'],
@@ -36,6 +36,6 @@ def update_video_data(video: Video,
                                     blank_content= check_video_quality['blank_content'],
                                     quality_rating= video_size_quality_rating)
         
-        video.video_process = video_process
+        video_path_fix.video_process = video_process
         print("processed")
-        return video
+        return video_path_fix

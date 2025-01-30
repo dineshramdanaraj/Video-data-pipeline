@@ -14,6 +14,8 @@ RUN curl -sSL https://install.python-poetry.org | python3 -
 # Switch back to airflow user
 USER airflow
 
+RUN airflow db init
+
 RUN pip install poetry
 # Copy poetry files first
 COPY pyproject.toml poetry.lock /opt/airflow/
@@ -21,17 +23,8 @@ COPY pyproject.toml poetry.lock /opt/airflow/
 # Set working directory
 WORKDIR /opt/airflow
 COPY datalake /opt/airflow/datalake/
-
-
-# Configure Poetry and install dependencies without creating virtualenv
-RUN poetry config virtualenvs.create false && poetry install --only main
-
-# Copy the datalake package
-COPY datalake /opt/airflow/datalake/
-
-# Install the root package
-
 COPY config/airflow.cfg /opt/airflow/airflow.cfg
+COPY client.properties /opt/airflow/
 
 # Create necessary directories
 RUN mkdir -p /opt/airflow/video_directory/local_staging \
@@ -39,3 +32,14 @@ RUN mkdir -p /opt/airflow/video_directory/local_staging \
 
 # Set environment variables
 ENV PYTHONPATH=/opt/airflow
+
+
+# Configure Poetry and install dependencies without creating virtualenv
+RUN poetry config virtualenvs.create false && poetry install --only main
+
+# Copy the datalake package
+
+
+# Install the root package
+
+

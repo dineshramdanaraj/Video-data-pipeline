@@ -40,10 +40,20 @@ def _modification_notification(DAG_CONSTANTS: dict, video: Video)-> None:
 
 
 # %%
+def _missing_file_notification(DAG_CONSTANTS: dict, video: Video)-> None:
+    subject= "Missing Meta data"
+    body = f"The video {video.path}, is missing metadata \n Note: the metadata(.json) should be of the same name"
+    _send_email(subject= subject, body= body, to_email= DAG_CONSTANTS['EMAIL_RECIEVER'])
+
+
+
+# %%
 def logger(DAG_CONSTANTS: dict, export_video_to_postgres: dict,video: Video) -> str:
     table_names = export_video_to_postgres
     if video.deleted:
         _delete_notification(DAG_CONSTANTS=DAG_CONSTANTS, video=video)
+    elif not video.has_metadata:
+        _missing_file_notification(DAG_CONSTANTS=DAG_CONSTANTS, video=video)
     elif video.video_process:
         _modification_notification(DAG_CONSTANTS=DAG_CONSTANTS, video=video)
     else:

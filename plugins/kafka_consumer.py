@@ -1,46 +1,37 @@
-# plugins/kafka_consumer.py
 from kafka import KafkaConsumer
 import json
-import os
 from typing import Dict, Any
-from dotenv import load_dotenv
 
-def create_kafka_consumer(bootstrap_servers: list=['localhost:9092'],
-                         topic: str='video_events') -> KafkaConsumer:
-    """Create a Kafka consumer instance."""
+def create_kafka_consumer(bootstrap_servers: list = ['kafka:9092'],  # Use kafka:9092 for Docker
+                         topic: str = 'Video_Watcher') -> KafkaConsumer:
     return KafkaConsumer(
         topic,
         bootstrap_servers=bootstrap_servers,
-        auto_offset_reset='earliest',
-        enable_auto_commit=True,
-        group_id='video_processor',
-        value_deserializer=lambda x: json.loads(x.decode('utf-8'))
+        auto_offset_reset='earliest',  # Start reading from the earliest message
+        enable_auto_commit=True,  # Automatically commit offsets
+        group_id='video_processor',  # Consumer group ID
+        value_deserializer=lambda x: json.loads(x.decode('utf-8')),  # Deserialize JSON messages
+        api_version=(2, 6, 0)  # Explicit Kafka API version
     )
 
-def consume_message(consumer: KafkaConsumer) -> Dict[str, Any]:
-    """Consume a single message from Kafka."""
-    try:
-        # Get the next message
-        message = next(consumer)
-        if message:
-            return {
-                "path": message.value.get("path"),
-                "arrival_time": message.value.get("arrival_time"),
-                "has_metadata": message.value.get("has_metadata", False),
-                "deleted": message.value.get("deleted", False)
-            }
-    except StopIteration:
-        return None
-    except Exception as e:
-        print(f"Error consuming message: {str(e)}")
-        return None
-
 def get_kafka_message() -> Dict[str, Any]:
-    """Get a message from Kafka for Airflow task."""
-    load_dotenv()
     consumer = create_kafka_consumer()
     try:
-        message = consume_message(consumer)
-        return message
+        # Poll for messages
+        message_batch = consumer.poll(timeout_ms=1000)  # Wait for 1 second for messages
+        if message_batch:
+            for topic_partition, messages in message_batch.items():
+                for message in messages:
+                    print(f"Received message: {message.value}")
+                    return {
+                        "path": message.value.get("path"),
+                        "arrival_time": message.value.get("arrival_time"),
+                        "has_metadata": message.value.get("has_metadata", False),
+                        "deleted": message.value.get("deleted", False)
+                    }
+        return None
     finally:
         consumer.close()
+
+if __name__ == "__main__":
+    get_kafka_message()

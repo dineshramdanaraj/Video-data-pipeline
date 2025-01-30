@@ -18,19 +18,28 @@
 import json
 import subprocess
 from typing import Union
-
+import os
 from datalake.common_func import Video
 
 
 # %%
-def ffmpeg_probe(video: Video) -> Union[dict, str]:
+def video_path_fix(video: Video) -> Video:
+    video_path = video.path
+    video_path = os.path.normpath(video_path)
+    video_path = video_path.replace("\\", "/")
+    video.path = video_path
+    return video
+
+
+# %%
+def ffmpeg_probe(video_path_fix: Video) -> Union[dict, str]:
     cmd = [
         "ffprobe",
         "-v", "quiet",
         "-print_format", "json",
         "-show_format",
         "-show_streams",
-        video.path
+        video_path_fix.path
     ]
     
     try:

@@ -21,16 +21,18 @@ import time
 from dataclasses import asdict
 from datetime import datetime
 
+# %%
+from confluent_kafka import Producer
 from watchdog.events import FileSystemEventHandler
 from watchdog.observers import Observer
 
-from datalake.common_func import Video
-from kafka import KafkaProducer
+# %%
+from datalake.common_func import Video, read_config
 
 
 # %%
 class VideoFileHandler(FileSystemEventHandler):
-    def __init__(self, kafka_producer: KafkaProducer, topic: str):
+    def __init__(self, kafka_producer: Producer, topic: str):
         self.producer = kafka_producer
         self.topic = topic
         self.videos = {}  # Store video objects
@@ -45,7 +47,7 @@ class VideoFileHandler(FileSystemEventHandler):
                 has_metadata = os.path.exists(f"{file_name}.json")
                 video = Video(path=file_path, arrival_time=arrival_time, has_metadata=has_metadata)
                 self.videos[file_path] = video
-                print(f"Video file arrived: {video.path} at {video.arrival_time}")
+                print(f"Video file arrived: {video.path} at {video.arrival_time} with {has_metadata}")
                 self.send_to_kafka(video)
 
     def on_deleted(self, event):
@@ -65,13 +67,22 @@ class VideoFileHandler(FileSystemEventHandler):
 
     def send_to_kafka(self, video: Video):
         video_json = json.dumps(asdict(video))
-        self.producer.send(self.topic, value=video_json.encode('utf-8'))
-        self.producer.flush()
+        self.producer.produce(
+            topic=self.topic,
+            value=video_json.encode('utf-8') 
+        )
+        self.producer.flush()  # Ensure the message is sent
         print(f"Sent video data to Kafka topic: {self.topic}")
 
+    def delivery_report(self, err, msg):
+        """Callback to report the success or failure of message delivery."""
+        if err is not None:
+            print(f"Message delivery failed: {err}")
+        else:
+            print(f"Message delivered to {msg.topic()} [{msg.partition()}]")
 
 # %%
-def watch_directory(path: str, kafka_producer: KafkaProducer, topic: str)-> None:
+def watch_directory(path: str, kafka_producer: Producer, topic: str) -> None:
     event_handler = VideoFileHandler(kafka_producer, topic)
     observer = Observer()
     observer.schedule(event_handler, path, recursive=False)
@@ -87,10 +98,9 @@ def watch_directory(path: str, kafka_producer: KafkaProducer, topic: str)-> None
 # %%
 if __name__ == "__main__":
     watch_dir = "./video_directory/local_sink"
-    kafka_bootstrap_servers = ['localhost:9094']
-    kafka_topic = 'Video_Watcher'
-
-    producer = KafkaProducer(bootstrap_servers=kafka_bootstrap_servers)
+    config = read_config()
+    kafka_topic = "Video_Watcher"
+    producer = Producer(config)
 
     print(f"Watching directory: {watch_dir}")
     watch_directory(watch_dir, kafka_producer=producer, topic=kafka_topic)

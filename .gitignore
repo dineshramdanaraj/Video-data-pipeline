@@ -6,7 +6,7 @@
 *.aws
 *.crt
 *.key
-
+*.properties
 # Build
 
 **/env
@@ -20,10 +20,6 @@
 # Note: Poetry lock files are committed
 # https://python-poetry.org/docs/basic-usage/#committing-your-poetrylock-file-to-version-control
 
-# MacOS
-.DS_Store
-.AppleDouble
-.LSOverride
 
 # Logs
 logs/
@@ -42,11 +38,11 @@ pids
 # Temporary datasets
 **/video_directory/local_sink
 **/video_directory/local_staging
-**/kafka
+**/kafka/data
 **/logs
 
 # Generated notebooks ipynb files
 **/datalake/**/*.ipynb
 
-# Databricks
-.databricks
+
+
