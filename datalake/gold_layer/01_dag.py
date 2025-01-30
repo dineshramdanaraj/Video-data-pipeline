@@ -46,7 +46,7 @@ create_schema = importlib.import_module("02_create_schema")
 export_to_postgres = importlib.import_module("03_export_to_postgres")
 email  = importlib.import_module("04_email")
 
-# https://github.com/DAGWorks-Inc/hamilton/issues/685
+# https://github.com/DAGWorks-Inc/hamilton/
 
 try:
     hamilton_driver = (

@@ -37,7 +37,7 @@ common_func = importlib.import_module("datalake.common_func")
 sink = importlib.import_module("02_sink")
 
 
-# https://github.com/DAGWorks-Inc/hamilton/issues/685
+# https://github.com/DAGWorks-Inc/hamilton/
 
 try:
     hamilton_driver = (

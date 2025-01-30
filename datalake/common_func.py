@@ -51,6 +51,8 @@ class Video:
 
 # %%
 def _send_email(subject: str, body: str, to_email: str)-> None:
+    #SMTPlib for sending mail
+    
     load_dotenv()
     from_email = os.getenv("EMAIL_USER")
     msg = MIMEText(body)

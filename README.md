@@ -1,39 +1,192 @@
-# Video-data-pipeline
+# Video Data Pipeline
 
-Install Grapviz
-Install Python
-Install Kafka
-Install Poetry
+This project implements a **video data processing pipeline** using a combination of modern tools and frameworks. The pipeline is designed to handle incoming video files, process them through multiple stages (bronze, silver, and gold layers), and finally store the processed data in a database while notifying users of updates. The architecture follows the **Medallion Architecture** for data transformation and leverages tools like **Apache Airflow**, **Kafka**, **Hamilton**, and **Graphviz** for orchestration, modularity, and visualization.
+
+---
+
+## Table of Contents
+- [Video Data Pipeline](#video-data-pipeline)
+  - [Table of Contents](#table-of-contents)
+  - [Overview](#overview)
+  - [Architecture](#architecture)
+  - [Tools and Technologies](#tools-and-technologies)
+  - [Setup and Installation](#setup-and-installation)
+    - [Prerequisites](#prerequisites)
+    - [Docker Images](#docker-images)
+    - [Install Dependencies](#install-dependencies)
+  - [Running the Pipeline](#running-the-pipeline)
+  - [Directory Structure](#directory-structure)
+  - [Environment Variables](#environment-variables)
+  - [DAG Workflows](#dag-workflows)
+    - [1. **Kafka Consumer DAG**](#1-kafka-consumer-dag)
+    - [2. **Video Process DAG**](#2-video-process-dag)
+
+---
+
+## Overview
+
+The **Video Data Pipeline** is a robust system for processing video files through a series of stages:
+1. **Bronze Layer**: Ingests raw video data from a Kafka producer.
+2. **Silver Layer**: Processes the video files (e.g., quality checks, metadata extraction, derivative generation).
+3. **Gold Layer**: Stores the processed data in a database and sends notifications to users.
+
+The pipeline is orchestrated using **Apache Airflow**, with modular components built using **Hamilton** for better testing and maintainability. Kafka is used as a message broker to trigger the pipeline when new video files arrive.
+
+---
+
+## Architecture
+
+The pipeline follows the **Medallion Architecture**, which consists of three layers:
+
+1. **Bronze Layer**:
+   - Ingests raw video data from Kafka.
+   - Validates and extracts basic metadata.
+   - Stores the raw data in a staging area.
+
+2. **Silver Layer**:
+   - Processes the video files (e.g., quality checks, resolution adjustments, metadata enrichment).
+   - Generates derivative videos if required.
+   - Updates the video metadata.
+
+3. **Gold Layer**:
+   - Stores the processed data in a PostgreSQL database.
+   - Sends email notifications to users using **SMTPlib**.
+
+---
+
+## Tools and Technologies
+
+- **Apache Airflow**: For orchestrating the macro-level DAG workflows.
+- **Kafka**: For message brokering and triggering the pipeline.
+- **Hamilton**: For building modular and testable micro-level DAGs.
+- **Graphviz**: For visualizing DAG workflows.
+- **Poetry**: For dependency management.
+- **Ruff**: For linting and organizing the code.
+- **Docker**: For containerizing Airflow and Kafka.
+- **SMTPlib**: For sending email notifications.
+- **PostgreSQL**: For storing processed data.
+
+---
+
+## Setup and Installation
+
+### Prerequisites
+1. Install **Graphviz**:
+   ```bash
+   sudo apt-get install graphviz
+   ```
+2. Install **Python** (>= 3.8).
+3. Install **Kafka**:
+   - Download Kafka from [here](https://kafka.apache.org/downloads).
+   - Follow the setup instructions in the official documentation.
+4. Install **Poetry**:
+   ```bash
+   pip install poetry
+   ```
+
+### Docker Images
+- **Airflow**: Use the official Airflow Docker image.
 
 
-Docker Image - Airflow
-Docker Image - Kafka??
+### Install Dependencies
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/your-username/video-data-pipeline.git
+   cd video-data-pipeline
+   ```
+2. Install dependencies using Poetry:
+   ```bash
+   poetry install
+   ```
 
-Install all the packages via - Poetry (package manager)
+---
 
-env variables (customize according to the need)
+## Running the Pipeline
 
-run sync-datalake-files.py to create temp .ipynb files for testing purposes - "python run sync-datalake-files.py
+1. **Set Up Environment Variables**:
+   - Create a `.env` file in the root directory and customize it according to your setup:
+     ```plaintext
+     KAFKA_BROKER=localhost:9092
+     KAFKA_TOPIC=video-topic
+     PG_CONN_URI=postgresql://user:password@localhost:5432/video_db
+     EMAIL_RECEIVER=user@example.com
+     SMTP_SERVER=smtp.example.com
+     SMTP_PORT=587
+     SMTP_USER=your-email@example.com
+     SMTP_PASSWORD=your-password
+     ```
 
-Local Sink - Directory used for watching incoming video
-Local Staging - Directory used for dumping derivative video
+2. **Run the Sync Script**:
+   - Generate temporary `.ipynb` files for testing:
+     ```bash
+     python sync-datalake-files.py
+     ```
 
-SMTPlib - used for messaging the users regarding pipeline updates
+3. **Start Docker Containers**:
+   - Start Airflow and Kafka using Docker Compose:
+     ```bash
+     docker-compose up
+     ```
 
-Graphviz - tool used to visualize DAG workflows within ipynb files
+4. **Trigger the Pipeline**:
+   - Send a Kafka message to trigger the pipeline:
+     ```bash
+     python producer.py
+     ```
 
-Hamilton - Used for micro level DAG for better modularity and testing 
+---
 
-Airflow - Used for Macro Level DAG
+## Directory Structure
 
-Kafka - Used as a prod-sub to send notification to the system on arrival of video files
+```
+video-data-pipeline/
+├── datalake/
+│   ├── bronze_layer/         # Bronze layer modules
+│   ├── silver_layer/         # Silver layer modules
+│   ├── gold_layer/           # Gold layer modules
+│   ├── common_func.py        # Common functions and utilities
+├── dags/                     # Airflow DAG definitions
+├── tests/                    # Unit and integration tests
+├── .env                      # Environment variables
+├── sync-datalake-files.py    # Script to generate test files
+├── producer.py               # Kafka producer script
+├── poetry.lock               # Poetry lock file
+├── pyproject.toml            # Poetry project configuration
+├── README.md                 # Project documentation
+```
 
-Ruff - Python Linter used for organizing the code.
+---
 
-Architecture-
-Meddalion Architecture - 3 layers of data loading/transformation
-                        Bronze - to load the extracted data from producer
-                        Silver - to process the video based on the task requirements
-                        Gold- to dump the data into the database after processing and sends notification.
+## Environment Variables
 
-                    
+| Variable         | Description                              | Example Value                     |
+|------------------|------------------------------------------|-----------------------------------|
+| `KAFKA_BROKER`   | Kafka broker address                     | `localhost:9092`                 |
+| `KAFKA_TOPIC`    | Kafka topic for video messages           | `video-topic`                    |
+| `PG_CONN_URI`    | PostgreSQL connection URI                | `postgresql://user:password@localhost:5432/video_db` |
+| `EMAIL_RECEIVER` | Email address for notifications          | `user@example.com`               |
+| `SMTP_SERVER`    | SMTP server for sending emails           | `smtp.example.com`               |
+| `SMTP_PORT`      | SMTP server port                         | `587`                            |
+| `SMTP_USER`      | SMTP username                            | `your-email@example.com`         |
+| `SMTP_PASSWORD`  | SMTP password                            | `your-password`                  |
+
+---
+
+## DAG Workflows
+
+### 1. **Kafka Consumer DAG**
+   - Listens to Kafka for new video messages.
+   - Triggers the **Video Process DAG** when a new video is detected.
+
+### 2. **Video Process DAG**
+   - Processes videos through the three layers:
+     1. **Bronze Task**: Ingests and validates raw video data.
+     2. **Silver Task**: Processes the video (quality checks, metadata extraction, etc.).
+     3. **Gold Task**: Stores the data in PostgreSQL and sends notifications.
+
+---
+
+
+
+
+
