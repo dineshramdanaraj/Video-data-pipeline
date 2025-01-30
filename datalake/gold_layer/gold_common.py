@@ -14,8 +14,12 @@
 #     name: python3
 # ---
 
-# %%
+# %% [markdown]
+# ### Gold Common
+# - common functions used accross gold layer
 
+# %%
+# Common Imports
 from psycopg2 import pool
 
 
@@ -40,5 +44,3 @@ def postgres_conn(DAG_CONSTANTS: dict) -> pool.SimpleConnectionPool:
     pg_pool.putconn(test_conn)
 
     return pg_pool
-
-# %%

@@ -14,6 +14,10 @@
 #     name: python3
 # ---
 
+# %% [markdown]
+# ## Bronze - Layer
+# - Hamilton Dag for the Layer
+
 # %%
 # So that modules can be reloaded without restarting the kernel
 # %reload_ext autoreload

@@ -14,7 +14,13 @@
 #     name: python3
 # ---
 
+# %% [markdown]
+# ## Producer For Kafka
+# - Uses WatchDog to monitor the local directory
+# - Sends message based on the events occuring in the directory
+
 # %%
+#Commpon Impirts
 import json
 import os
 import time

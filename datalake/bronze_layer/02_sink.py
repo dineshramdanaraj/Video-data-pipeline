@@ -14,6 +14,10 @@
 #     name: python3
 # ---
 
+# %% [markdown]
+# ### Sink
+# - Acts as a data sink by converting kafka messages into Video data.
+
 # %%
 from datetime import datetime
 
@@ -48,5 +52,3 @@ def kafka_message_to_video(message: Optional[Union[dict, str]]) -> Optional[Vide
     
 
     return video
-
-# %%

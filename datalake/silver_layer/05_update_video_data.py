@@ -14,6 +14,12 @@
 #     name: python3
 # ---
 
+# %% [markdown]
+# ### Update Video Data
+# - based on the previous 2 files (derivative and video_check)
+# - The file update the Video data by creating a Video Process class and ssigning the resultant values
+#   
+
 # %%
 from typing import Union
 

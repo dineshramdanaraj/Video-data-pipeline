@@ -14,7 +14,12 @@
 #     name: python3
 # ---
 
+# %% [markdown]
+# ### Email
+# - to send notification to the reciever's mail (based on the actions carried out in the directory)
+
 # %%
+# Common Imports
 from datalake.common_func import Video, _send_email
 
 

@@ -15,7 +15,8 @@
 # ---
 
 # %% [markdown]
-# ## Gold- Layer
+# ## Gold - Layer
+# - Hamilton Dag for the Layer
 
 # %%
 # So that modules can be reloaded without restarting the kernel
@@ -87,5 +88,3 @@ result = hamilton_driver.execute(
     inputs={"DAG_CONSTANTS": DAG_CONSTANTS, "video": video},
 )
 result["logger"]
-
-# %%

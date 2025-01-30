@@ -14,6 +14,11 @@
 #     name: python3
 # ---
 
+# %% [markdown]
+# ### Postgres Schema
+# - Creates a Schema in Postgres
+# - Used for grouping tables inside a DB in Postgres
+
 # %%
 # Common imports
 from psycopg2 import pool

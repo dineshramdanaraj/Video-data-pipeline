@@ -8,9 +8,20 @@
 #       format_name: percent
 #       format_version: '1.3'
 #       jupytext_version: 1.16.6
+#   kernelspec:
+#     display_name: datalake-NzdzUkV_-py3.12
+#     language: python
+#     name: python3
 # ---
 
+# %% [markdown]
+# ### Postgres
+#  - The .py involves in function that logs the activity in Postgres
+#  - Creates 2 tables (Video & Video Process)
+#  - Uses the path (location) of the file as a primary key
+
 # %%
+# Common Imports
 from psycopg2 import pool
 
 from datalake.common_func import Video

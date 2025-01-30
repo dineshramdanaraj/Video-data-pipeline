@@ -14,7 +14,14 @@
 #     name: python3
 # ---
 
+# %% [markdown]
+# ### Video Check
+# - Follows the tasks provided in Description
+# - Checks on the 3 parameters (Size, Corruption, Blankness of the content)
+# - Assigns rating to video based on quality
+
 # %%
+#Common Imports
 import os
 from typing import Union
 

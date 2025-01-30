@@ -14,11 +14,18 @@
 #     name: python3
 # ---
 
+# %% [markdown]
+# ### Silver Common
+# - Contains all the common functions used accross silver layer
+#   
+
 # %%
+#Common Imports
 import json
+import os
 import subprocess
 from typing import Union
-import os
+
 from datalake.common_func import Video
 
 

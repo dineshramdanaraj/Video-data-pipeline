@@ -15,21 +15,11 @@
 # ---
 
 # %% [markdown]
-# ## ffmpeg subprocess
-
-
-# %% [markdown]
-# ## smtp
-
-
-# %% [markdown]
-# ## connecting sql
-
-
-# %% [markdown]
-# ## connecting in memory data (duckdb)
+# ### Common Functions
+# - Used accross the DATALAKE
 
 # %%
+#Common Imports
 import os
 import smtplib
 from dataclasses import dataclass
