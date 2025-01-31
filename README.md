@@ -17,6 +17,7 @@ This project implements a **video data processing pipeline** using a combination
   - [Running the Pipeline](#running-the-pipeline)
   - [Directory Structure](#directory-structure)
   - [Environment Variables](#environment-variables)
+  - [|------------------|------------------------------------------|-----------------------------------|](#-----------------------------------------------------------------------------------------------)
   - [Client.properties](#clientproperties)
   - [DAG Workflows](#dag-workflows)
     - [1. **Kafka Consumer DAG**](#1-kafka-consumer-dag)
@@ -180,7 +181,7 @@ video-data-pipeline/
 | `SMTP_PORT`      | SMTP server port                         | `587`                            |
 | `SMTP_USER`      | SMTP username                            | `your-email@example.com`         |
 | `SMTP_PASSWORD`  | SMTP password                            | `your-password`                  |
-
+|------------------|------------------------------------------|-----------------------------------|
 ---
 ## Client.properties
 
