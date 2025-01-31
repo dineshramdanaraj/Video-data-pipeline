@@ -47,28 +47,51 @@ class VideoFileHandler(FileSystemEventHandler):
         if not event.is_directory:
             file_path = event.src_path
             file_name, file_extension = os.path.splitext(file_path)
-            file_path = os.path.normpath(file_path).replace("\\", "/")
+            file_path = os.path.normpath(file_path).replace("\\", "/")  # Normalize the path
+
             if file_extension.lower() in ['.mp4', '.avi', '.mov']:
-                
+                # Handle video files
                 arrival_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-                print(f"{file_name}.json")
+                print(f"Checking for metadata file: {file_name}.json")
                 has_metadata = os.path.exists(f"{file_name}.json")
                 video = Video(path=file_path, arrival_time=arrival_time, has_metadata=has_metadata)
                 self.videos[file_path] = video
                 print(f"Video file arrived: {video.path} at {video.arrival_time} with {has_metadata}")
                 self.send_to_kafka(video)
 
+            elif file_extension.lower() == '.json':
+                # Handle JSON files (metadata)
+                arrival_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+                video_extensions = ['.mp4', '.avi', '.mov']
+                for ext in video_extensions:
+                    video_file_path = f"{file_name}{ext}"
+                    if os.path.exists(video_file_path):
+                        # If a corresponding video file exists, create a Video object
+                        video = Video(path=video_file_path, arrival_time=arrival_time, has_metadata=True)
+                        self.videos[video_file_path] = video
+                        print(f"Metadata file arrived: {file_path} for video {video_file_path}")
+                        self.send_to_kafka(video)
+                        break  
+                    
+
+
     def on_deleted(self, event):
-        if not event.is_directory and event.src_path in self.videos:
-            video = self.videos[event.src_path]
+        file_path = event.src_path
+        file_path = os.path.normpath(file_path).replace("\\", "/")
+        if not event.is_directory and file_path in self.videos:
+
+            video = self.videos[file_path]
             video.deleted = True
             print(f"Video file deleted: {video.path}")
             self.send_to_kafka(video)
-            del self.videos[event.src_path]
+            del self.videos[file_path]
 
     def on_modified(self, event):
-        if not event.is_directory and event.src_path in self.videos:
-            video = self.videos[event.src_path]
+
+        file_path = event.src_path
+        file_path = os.path.normpath(file_path).replace("\\", "/")
+        if not event.is_directory and file_path in self.videos:
+            video = self.videos[file_path]
             video.arrival_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
             print(f"Video file modified: {video.path} at {video.arrival_time}")
             self.send_to_kafka(video)
