@@ -21,7 +21,7 @@
 #   
 
 # %%
-from typing import Union, Optional
+from typing import Optional, Union
 
 from datalake.common_func import Video, VideoProcess
 

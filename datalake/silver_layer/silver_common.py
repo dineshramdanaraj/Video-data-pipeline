@@ -55,4 +55,3 @@ def ffmpeg_probe(video_path_fix: Video) -> Union[dict, str]:
         return video_info
     except subprocess.CalledProcessError:
         return "corrupt"
-

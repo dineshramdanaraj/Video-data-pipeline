@@ -23,9 +23,41 @@
 # %%
 #Common Imports
 import os
+import subprocess
 from typing import Union
 
 from datalake.common_func import Video
+
+
+# %%
+def _is_video_blank(video_path: str) -> bool:
+    """
+    Checks if a video is blank (e.g., entirely black, entirely white, or without meaningful content).
+
+    Args:
+        video_path (str): Path to the video file.
+
+    Returns:
+        bool: True if the video is blank, False otherwise.
+    """
+    try:
+        # Use ffmpeg to extract frames and analyze them
+        command = [
+            "ffmpeg",
+            "-i", video_path,  
+            "-vf", "format=gray,blackdetect=d=0.1:pix_th=0.1", 
+            "-f", "null", "-"
+        ]
+
+        # Run the ffmpeg command
+        result = subprocess.run(command, stderr=subprocess.PIPE, text=True)
+
+        # Check the output for black frame detection
+        return "blackdetect" in result.stderr
+
+    except Exception as e:
+        print(f"Error analyzing video for blank content: {e}")
+        return False
 
 
 # %%
@@ -52,12 +84,17 @@ def check_video_quality(DAG_CONSTANTS: dict,video_path_fix: Video, ffmpeg_probe:
         if "streams" not in video_info or len(video_info["streams"]) == 0:
             results["corruption"] = True
         
+        else: 
+            if _is_video_blank(video_path):
+                results["blank_content"] = True
+        
         # Check for blank content
-        for stream in video_info.get("streams", []):
-            if stream["codec_type"] == "video":
-                if int(float(stream.get("duration", "0"))) == 0:
-                    results["blank_content"] = True
-                break
+            for stream in video_info.get("streams", []):
+                if stream["codec_type"] == "video":
+                    if int(float(stream.get("duration", "0"))) == 0:
+                        results["blank_content"] = True
+                    break
+            
     
     return results
 
