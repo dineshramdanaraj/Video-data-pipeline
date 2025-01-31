@@ -40,6 +40,7 @@ pids
 **/video_directory/local_staging
 **/kafka/data
 **/logs
+**/datalake/explore
 
 # Generated notebooks ipynb files
 **/datalake/**/*.ipynb
