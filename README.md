@@ -185,14 +185,15 @@ video-data-pipeline/
 ## Client.properties
 
  - For Confluent Kafka Setup
-| Variable           | Description                              | Example Value                     |
-|--------------------|------------------------------------------|-----------------------------------|
-| `bootstrap.servers`|  Kafka broker addresses to connect to.   | `kakfa:9092`                      |
-| `security.protocol`| Communicate with Kafka brokers           | `SASL_SSL`                        |
-| `sasl.mechanisms`  | SASL mechanism used for authentication   | `PLAIN`                           |
-| `sasl.username`    | Username for SASL authentication.        | `your-username`                   |
-| `sasl.password`    | Password for SASL authentication.        | `your-password`                   |
-| `client.id`        | Unique identifier for the Kafka client.  | `AVD BVV`                         |
+| Variable | Description | Example Value |
+|----------|-------------|---------------|
+| `bootstrap.servers` | Kafka broker addresses to connect to | `kafka:9092` |
+| `security.protocol` | Communicate with Kafka brokers | `SASL_SSL` |
+| `sasl.mechanisms` | SASL mechanism used for authentication | `PLAIN` |
+| `sasl.username` | Username for SASL authentication | `your-username` |
+| `sasl.password` | Password for SASL authentication | `your-password` |
+| `client.id` | Unique identifier for the Kafka client | `AVD BVV` |
+
 
 ---
 ## DAG Workflows
