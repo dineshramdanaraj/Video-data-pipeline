@@ -17,7 +17,6 @@ This project implements a **video data processing pipeline** using a combination
   - [Running the Pipeline](#running-the-pipeline)
   - [Directory Structure](#directory-structure)
   - [Environment Variables](#environment-variables)
-  - [|------------------|------------------------------------------|-----------------------------------|](#-----------------------------------------------------------------------------------------------)
   - [Client.properties](#clientproperties)
   - [DAG Workflows](#dag-workflows)
     - [1. **Kafka Consumer DAG**](#1-kafka-consumer-dag)
@@ -181,19 +180,20 @@ video-data-pipeline/
 | `SMTP_PORT`      | SMTP server port                         | `587`                            |
 | `SMTP_USER`      | SMTP username                            | `your-email@example.com`         |
 | `SMTP_PASSWORD`  | SMTP password                            | `your-password`                  |
-|------------------|------------------------------------------|-----------------------------------|
+
 ---
 ## Client.properties
+| Variable         | Description                              | Example Value                     |
+|------------------|------------------------------------------|-----------------------------------|
+| `bootstrap.servers`    | Kafka broker addresses to connect to | `kafka:9092`                           |
+| `security.protocol`    | Communicate with Kafka brokers               | `SASL_SSL` |
+| `sasl.mechanisms` | SASL mechanism used for authentication          | `PLAIN`               |
+| `sasl.username`    | Username for SASL authentication           | `your-username` |
+| `your-password`      | Password for SASL authentication                   | `587`                        |
+| `client.id`      | Unique identifier for the Kafka client                          | `AVD BVV`         |
 
- - For Confluent Kafka Setup
-| Variable | Description | Example Value |
-|----------|-------------|---------------|
-| `bootstrap.servers` | Kafka broker addresses to connect to | `kafka:9092` |
-| `security.protocol` | Communicate with Kafka brokers | `SASL_SSL` |
-| `sasl.mechanisms` | SASL mechanism used for authentication | `PLAIN` |
-| `sasl.username` | Username for SASL authentication | `your-username` |
-| `sasl.password` | Password for SASL authentication | `your-password` |
-| `client.id` | Unique identifier for the Kafka client | `AVD BVV` |
+
+
 
 
 ---
