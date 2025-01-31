@@ -17,7 +17,7 @@ This project implements a **video data processing pipeline** using a combination
   - [Running the Pipeline](#running-the-pipeline)
   - [Directory Structure](#directory-structure)
   - [Environment Variables](#environment-variables)
-  - [Client.properties](#clientproperties)
+  - [Client Properties](#client-properties)
   - [DAG Workflows](#dag-workflows)
     - [1. **Kafka Consumer DAG**](#1-kafka-consumer-dag)
     - [2. **Video Process DAG**](#2-video-process-dag)
@@ -182,7 +182,7 @@ video-data-pipeline/
 | `SMTP_PASSWORD`  | SMTP password                            | `your-password`                  |
 
 ---
-## Client.properties
+## Client Properties
 | Variable         | Description                              | Example Value                     |
 |------------------|------------------------------------------|-----------------------------------|
 | `bootstrap.servers`    | Kafka broker addresses to connect to | `kafka:9092`                           |
@@ -192,7 +192,7 @@ video-data-pipeline/
 | `your-password`      | Password for SASL authentication                   | `587`                        |
 | `client.id`      | Unique identifier for the Kafka client                          | `AVD BVV`         |
 
-
+   - For Confluent Kafka Set Up.
 
 
 
