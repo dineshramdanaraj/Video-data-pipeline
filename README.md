@@ -17,9 +17,11 @@ This project implements a **video data processing pipeline** using a combination
   - [Running the Pipeline](#running-the-pipeline)
   - [Directory Structure](#directory-structure)
   - [Environment Variables](#environment-variables)
+  - [Client.properties](#clientproperties)
   - [DAG Workflows](#dag-workflows)
     - [1. **Kafka Consumer DAG**](#1-kafka-consumer-dag)
     - [2. **Video Process DAG**](#2-video-process-dag)
+  - [Note:](#note)
 
 ---
 
@@ -75,10 +77,17 @@ The pipeline follows the **Medallion Architecture**, which consists of three lay
    ```bash
    sudo apt-get install graphviz
    ```
-2. Install **Python** (>= 3.8).
+   In windows ( add environment variable and path to the graphviz setup file)
+2. Install **Python** (>= 3.12).
 3. Install **Kafka**:
-   - Download Kafka from [here](https://kafka.apache.org/downloads).
-   - Follow the setup instructions in the official documentation.
+   a. Apache Kafka
+      - Download Kafka.
+      - Follow the setup instructions in the official documentation.
+      - Docker Image For Windows 
+   b. Confluent Kafka
+      - Set up Confluent Account
+      - Create a KAFKA cluster on Confluent Cloud
+      - Integrate it with the project with the help of client.properties file 
 4. Install **Poetry**:
    ```bash
    pip install poetry
@@ -98,7 +107,10 @@ The pipeline follows the **Medallion Architecture**, which consists of three lay
    ```bash
    poetry install
    ```
-
+3. Install Docker Images
+   ```bash
+   docker build
+   ```
 ---
 
 ## Running the Pipeline
@@ -106,8 +118,6 @@ The pipeline follows the **Medallion Architecture**, which consists of three lay
 1. **Set Up Environment Variables**:
    - Create a `.env` file in the root directory and customize it according to your setup:
      ```plaintext
-     KAFKA_BROKER=localhost:9092
-     KAFKA_TOPIC=video-topic
      PG_CONN_URI=postgresql://user:password@localhost:5432/video_db
      EMAIL_RECEIVER=user@example.com
      SMTP_SERVER=smtp.example.com
@@ -119,7 +129,7 @@ The pipeline follows the **Medallion Architecture**, which consists of three lay
 2. **Run the Sync Script**:
    - Generate temporary `.ipynb` files for testing:
      ```bash
-     python sync-datalake-files.py
+     poetry run python sync-datalake-files.py
      ```
 
 3. **Start Docker Containers**:
@@ -131,7 +141,7 @@ The pipeline follows the **Medallion Architecture**, which consists of three lay
 4. **Trigger the Pipeline**:
    - Send a Kafka message to trigger the pipeline:
      ```bash
-     python producer.py
+     poetry run python producer.py
      ```
 
 ---
@@ -146,6 +156,8 @@ video-data-pipeline/
 │   ├── gold_layer/           # Gold layer modules
 │   ├── common_func.py        # Common functions and utilities
 ├── dags/                     # Airflow DAG definitions
+├── config/
+│   ├── airflow.cfg           # Stores Airflow Configurations
 ├── tests/                    # Unit and integration tests
 ├── .env                      # Environment variables
 ├── sync-datalake-files.py    # Script to generate test files
@@ -161,8 +173,7 @@ video-data-pipeline/
 
 | Variable         | Description                              | Example Value                     |
 |------------------|------------------------------------------|-----------------------------------|
-| `KAFKA_BROKER`   | Kafka broker address                     | `localhost:9092`                 |
-| `KAFKA_TOPIC`    | Kafka topic for video messages           | `video-topic`                    |
+| `AIRFLOW_UID`    | Airflow Unique ID                        | `76888`                           |
 | `PG_CONN_URI`    | PostgreSQL connection URI                | `postgresql://user:password@localhost:5432/video_db` |
 | `EMAIL_RECEIVER` | Email address for notifications          | `user@example.com`               |
 | `SMTP_SERVER`    | SMTP server for sending emails           | `smtp.example.com`               |
@@ -171,7 +182,19 @@ video-data-pipeline/
 | `SMTP_PASSWORD`  | SMTP password                            | `your-password`                  |
 
 ---
+## Client.properties
 
+ - For Confluent Kafka Setup
+| Variable           | Description                              | Example Value                     |
+|--------------------|------------------------------------------|-----------------------------------|
+| `bootstrap.servers`|  Kafka broker addresses to connect to.   | `kakfa:9092`                      |
+| `security.protocol`| Communicate with Kafka brokers           | `SASL_SSL`                        |
+| `sasl.mechanisms`  | SASL mechanism used for authentication   | `PLAIN`                           |
+| `sasl.username`    | Username for SASL authentication.        | `your-username`                   |
+| `sasl.password`    | Password for SASL authentication.        | `your-password`                   |
+| `client.id`        | Unique identifier for the Kafka client.  | `AVD BVV`                         |
+
+---
 ## DAG Workflows
 
 ### 1. **Kafka Consumer DAG**
@@ -187,6 +210,10 @@ video-data-pipeline/
 ---
 
 
+## Note: 
+- The DAG images are generated in 01_dag.ipynb in each directory(Bronze, Silver, Gold) via Graphviz (for better visualization).
+- The helper functions are created as a private functions, so that they aren't considered a DAG Task/Function.
+- Update the dataclasses created for Pipeline in Airflow.cfg, to make sure Airflow DAG recognizes it.
 
 
 
