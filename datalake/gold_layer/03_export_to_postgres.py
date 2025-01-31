@@ -95,7 +95,7 @@ def export_video_to_postgres(
     create_videos_process_table: str,
     postgres_conn: pool.SimpleConnectionPool,
     video: Video
-) -> dict:
+) -> tuple:
     """
     Exports video data from a Video object to PostgreSQL with proper schema.
     If a row with the same primary key exists, it updates the existing row.
@@ -105,7 +105,9 @@ def export_video_to_postgres(
     video_table = create_videos_table
     conn = postgres_conn.getconn()
     cur = conn.cursor()
-
+    Update_Flag = False
+    print(video)
+    video = video
     try:
         # Insert or update data in the 'videos' table
         cur.execute(f"""
@@ -119,13 +121,19 @@ def export_video_to_postgres(
         SET
             Arrival_Time = EXCLUDED.Arrival_Time,
             Has_Metadata = EXCLUDED.Has_Metadata,
-            Deleted = EXCLUDED.Deleted;
+            Deleted = EXCLUDED.Deleted
+        RETURNING Video_Path, xmax::text::int > 0 AS updated;
         """, (
             video.path,
             video.arrival_time,
             video.has_metadata,
             video.deleted
         ))
+
+        # Check if the row was updated
+        result = cur.fetchone()
+        if result and result[1]:  # If updated is True
+            print(f"Updated existing row in '{video_table}' for Video_Path: {result[0]}")
 
         # Insert or update data in the 'video_process' table if video_process exists
         if video.video_process:
@@ -144,22 +152,30 @@ def export_video_to_postgres(
                 Quality_Rating = EXCLUDED.Quality_Rating,
                 Size_Anamoly = EXCLUDED.Size_Anamoly,
                 Corruption = EXCLUDED.Corruption,
-                Blank_Content = EXCLUDED.Blank_Content;
+                Blank_Content = EXCLUDED.Blank_Content
+            RETURNING Video_Path, xmax::text::int > 0 AS updated;
             """, (
                 video.path,
-                video.video_process.derivative_path,
-                video.video_process.quality_rating,
-                video.video_process.size_anamoly,
-                video.video_process.corruption,
-                video.video_process.blank_content
+                video.video_process['derivative_path'],
+                video.video_process['quality_rating'],
+                video.video_process['size_anamoly'],
+                video.video_process['corruption'],
+                video.video_process['blank_content']
             ))
+
+            # Check if the row was updated
+            result = cur.fetchone()
+            if result and result[1]:  # If updated is True
+                Update_Flag = True
+                
 
         conn.commit()
         table_names['video_process'] = video_process_table
         table_names['videos'] = video_table
+       
 
     finally:
         cur.close()
         postgres_conn.putconn(conn)
 
-    return table_names
+    return (table_names, Update_Flag)

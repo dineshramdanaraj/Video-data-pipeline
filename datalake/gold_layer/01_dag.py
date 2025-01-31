@@ -37,7 +37,6 @@ from hamilton.execution import executors
 from datalake.common_func import Video, VideoProcess
 
 
-
 # %%
 gold_common = importlib.import_module("gold_common")
 common_func = importlib.import_module("datalake.common_func")
@@ -69,16 +68,17 @@ DAG_CONSTANTS = {
     "PG_CONN": os.getenv("PG_CONN_URI") 
 }
 
-video_process = VideoProcess(derivative_path="video_directory/local_staging/4114797-uhd_3840_2160_25fps_processed.mp4",
+
+video_process = VideoProcess(derivative_path=None,
                              size_anamoly= False,
                              corruption= False,
                              blank_content= False,
                              quality_rating= 4
                              )
 
-video = Video(path="C:/Program Files/chop assignment/video_directory/local_staging/4114797-uhd_3840_2160_25fps.mp4",
+video = Video(path="C:/Program Files/chop assignment/video_directory/local_staging/eleee.mp4",
 arrival_time=datetime(2025, 1, 28, 4, 0),
-has_metadata= True,
+has_metadata= False,
 video_process= video_process,
 deleted=False)
 

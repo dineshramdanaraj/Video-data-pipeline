@@ -79,12 +79,3 @@ def read_config()-> dict:
         parameter, value = line.strip().split('=', 1)
         config[parameter] = value.strip()
   return config
-
-
-# %%
-def video_path_fix(video: Video) -> Video:
-    video_path = video.path
-    video_path = os.path.normpath(video_path)
-    video_path = video_path.replace("\\", "/")
-    video.path = video_path
-    return video

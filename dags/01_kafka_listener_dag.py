@@ -68,7 +68,7 @@ def trigger_processing_dag(**context):
 with DAG(
     'kafka_listener_dag',
     default_args=default_args,
-    schedule_interval='*/2 * * * *',  # Run every 2 minutes
+    schedule_interval='*/2 * * * *',  
     catchup=False
 ) as dag:
 

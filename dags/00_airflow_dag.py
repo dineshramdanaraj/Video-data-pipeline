@@ -9,7 +9,7 @@ from confluent_kafka import Consumer, KafkaError
 from dotenv import load_dotenv
 from hamilton import driver
 
-from datalake.common_func import Video, video_path_fix
+from datalake.common_func import Video
 
 # Load environment variables and constants
 load_dotenv()
@@ -79,7 +79,7 @@ def run_silver_layer(**context):
 
 def run_gold_layer(**context):
     ti = context['task_instance']
-    video_data = ti.xcom_pull(task_ids='silver_task', key='silver_result')
+    video_data = ti.xcom_pull(task_ids='conditional_silver_task', key='silver_result')
     
     gold_driver = driver.Builder().with_modules(
         gold_common,
@@ -121,7 +121,6 @@ def conditional_execute_silver_layer(**context):
     if skip_silver:
         # Skip silver layer and directly call gold layer
         video_data = ti.xcom_pull(task_ids='check_video_data', key='video_data')
-        video_data = video_path_fix(video_data)
         ti.xcom_push(key='silver_result', value=video_data)
     else:
         # Proceed to silver layer

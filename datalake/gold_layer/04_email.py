@@ -53,13 +53,14 @@ def _missing_file_notification(DAG_CONSTANTS: dict, video: Video)-> None:
 
 
 # %%
-def logger(DAG_CONSTANTS: dict, export_video_to_postgres: dict,video: Video) -> str:
-    table_names = export_video_to_postgres
+def logger(DAG_CONSTANTS: dict, export_video_to_postgres: tuple,video: Video) -> str:
+    table_names = export_video_to_postgres[0]
+    update = export_video_to_postgres[1]
     if video.deleted:
         _delete_notification(DAG_CONSTANTS=DAG_CONSTANTS, video=video)
     elif not video.has_metadata:
         _missing_file_notification(DAG_CONSTANTS=DAG_CONSTANTS, video=video)
-    elif video.video_process:
+    elif update:
         _modification_notification(DAG_CONSTANTS=DAG_CONSTANTS, video=video)
     else:
         _create_notification(DAG_CONSTANTS=DAG_CONSTANTS, video=video)

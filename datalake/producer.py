@@ -47,9 +47,11 @@ class VideoFileHandler(FileSystemEventHandler):
         if not event.is_directory:
             file_path = event.src_path
             file_name, file_extension = os.path.splitext(file_path)
-            
+            file_path = os.path.normpath(file_path).replace("\\", "/")
             if file_extension.lower() in ['.mp4', '.avi', '.mov']:
+                
                 arrival_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+                print(f"{file_name}.json")
                 has_metadata = os.path.exists(f"{file_name}.json")
                 video = Video(path=file_path, arrival_time=arrival_time, has_metadata=has_metadata)
                 self.videos[file_path] = video
@@ -72,6 +74,8 @@ class VideoFileHandler(FileSystemEventHandler):
             self.send_to_kafka(video)
 
     def send_to_kafka(self, video: Video):
+        file_path = os.path.normpath(video.path).replace("\\", "/")
+        video.path = file_path
         video_json = json.dumps(asdict(video))
         self.producer.produce(
             topic=self.topic,

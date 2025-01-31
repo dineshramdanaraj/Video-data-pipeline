@@ -31,11 +31,4 @@ def process_video(input_path:str, output_dir: str)-> str:
     subprocess.run(cmd, check=True)
     return output_path
 
-
-# %%
-input = "C:/Program Files/chop assignment/video_directory/4114797-uhd_3840_2160_25fps.mp4"
-output_dir = "C:/Program Files/chop assignment/video_directory/local_staging"
-process_video(input_path=input, output_dir=output_dir)
-
-
 # %%

@@ -20,7 +20,7 @@ def get_kafka_message() -> Dict[str, Any]:
         # Poll for messages
         message_batch = consumer.poll(timeout_ms=1000)  # Wait for 1 second for messages
         if message_batch:
-            for topic_partition, messages in message_batch.items():
+            for _, messages in message_batch.items():
                 for message in messages:
                     print(f"Received message: {message.value}")
                     return {

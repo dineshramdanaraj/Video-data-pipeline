@@ -21,14 +21,17 @@
 # %%
 import os
 import subprocess
+from typing import Optional
 
 from datalake.common_func import Video
 
 
 # %%
-def process_video(video_path_fix: Video, DAG_CONSTANTS: dict) -> str:
+def process_video(video_path_fix: Video, check_video_quality: dict, DAG_CONSTANTS: dict) -> Optional[str]:
     # Extract file name from input path
     input_path = video_path_fix.path
+    if check_video_quality['corruption'] or check_video_quality['blank_content']:
+        return None
     file_name = os.path.basename(input_path)
     output_file = file_name.replace('.mp4', '_processed.mp4')
     output_path = os.path.join(DAG_CONSTANTS['STAGING_DIRECTORY'], output_file)

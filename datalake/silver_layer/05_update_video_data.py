@@ -21,7 +21,7 @@
 #   
 
 # %%
-from typing import Union
+from typing import Union, Optional
 
 from datalake.common_func import Video, VideoProcess
 
@@ -31,7 +31,7 @@ from datalake.common_func import Video, VideoProcess
 def update_video_data(video_path_fix: Video,
                         video_size_quality_rating: int,
                         check_video_quality: dict,
-                        process_video: str) -> Video:
+                        process_video: Optional[str]) -> Video:
     if video_path_fix.deleted or not video_path_fix.has_metadata:
         print("skipped")
         return video_path_fix
@@ -45,3 +45,5 @@ def update_video_data(video_path_fix: Video,
         video_path_fix.video_process = video_process
         print("processed")
         return video_path_fix
+
+# %%

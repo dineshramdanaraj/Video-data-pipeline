@@ -138,12 +138,3 @@ def video_size_quality_rating(video_config: dict, video_path: str, threshold: fl
 
 
 # %%
-# Example usage
-video_path = "/video_directory/4114797-uhd_3840_2160_25fps.mp4"
-result = check_video_quality(video_path)
-print(result)
-
-# %%
-video_size_quality_rating(video_config=VIDEO_CONFIG, video_path=video_path)
-
-# %%
